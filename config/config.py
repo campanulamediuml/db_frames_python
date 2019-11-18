@@ -5,3 +5,6 @@ db_config = {
     'database': 'test_base',
     'port': 3306,
 }
+
+show_sql = True
+

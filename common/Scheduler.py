@@ -2,8 +2,19 @@ import time
 import heapq
 from threading import Timer
 import random
+import _thread as thread
 
 TIME_ACCURACY = 1  # 时间精度，时间精度不是越小越好！你的Task每次循环超过了这个值,将影响准确度
+
+def IntervalTask(sec,func,args=()):
+    def run():
+        while 1:
+            func(*args)
+            time.sleep(sec)
+
+    thread.start_new_thread(run, args)
+
+
 
 
 class Scheduler(object):
@@ -14,7 +25,7 @@ class Scheduler(object):
         heapq.heappush(Scheduler.tasks, (task.get_runtime(), task))
 
     @staticmethod
-    def run(is_timer = False):
+    def run(is_timer=False):
         now_time = time.time()
         while Scheduler.tasks and now_time >= Scheduler.tasks[0][0]:
             _, task = heapq.heappop(Scheduler.tasks)
@@ -58,7 +69,7 @@ class Task(object):
         return self._cycle
 
     def get_runtime(self):
-        return self._runtime + random.random()/100
+        return self._runtime + random.random() / 100
 
     def start(self):
         Scheduler.add(self)
@@ -68,16 +79,22 @@ class Task(object):
 作用：简单定时任务
 runtime:开始时间(时间戳)
 '''
+
+
 class NormalTask(Task):
 
     def __init__(self, runtime, func, args=()):
         Task.__init__(self, func, args)
         self._runtime = runtime
-        self.start(self)
+        self.start()
+
+
 '''
 作用：倒计时定时任务
 countdown:倒计时，这个时间后开始执行（单位：秒）
 '''
+
+
 class CountdownTask(Task):
 
     def __init__(self, countdown, func, args=()):
@@ -85,24 +102,26 @@ class CountdownTask(Task):
         self._runtime += countdown
         self.start()
 
+
 '''
 作用：循环定时任务
 interval:循环周期（单位：秒）
 '''
-class IntervalTask(Task):
 
-    def __init__(self, interval, func, args=()):
-        Task.__init__(self, func, args)
-        self._interval = interval
-        self._cycle = True
-        self.start()
+
+# class IntervalTask(Task):
+#
+#     def __init__(self, interval, func, args=()):
+#         Task.__init__(self, func, args)
+#         self._interval = interval
+#         self._cycle = True
+#         self.start()
 
 
 def test(x, y):
     print(time.time())
 
     print(x + y)
-
 
 
 if "__main__" == __name__:

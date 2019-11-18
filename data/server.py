@@ -1,62 +1,40 @@
-from data.base_method.dbserver.base import Base
-from config.config import db_config
-
+from data.dbserver.data_manager import data_manager
 
 class Data(object):
-    t_data = db_config
-    sql = Base(t_data['host'], t_data['user'], t_data['password'], t_data['database'])
+    Base = data_manager()
 
     @staticmethod
-    def get_tables():
-        return Data.sql._tables
+    def create(table, colums):
+        return Data.Base.create(table, colums)
 
     @staticmethod
-    def insert(table, params, is_commit = True):
-        return Data.sql.insert(table, params, is_commit)
+    def insert(table, params, is_commit=True):
+        return Data.Base.insert(table, params, is_commit)
 
     @staticmethod
-    def find(table, conditions, fields='*',order=None):
-        return Data.sql.find(table, conditions, fields,order)
+    def find(table, conditions, fields='*', order=None):
+        return Data.Base.find(table, conditions, fields, order)
 
     @staticmethod
-    def find_part(table, key_word):
-        return Data.sql.find_part(table, key_word)
+    def select(table, conditions, fields='*', order=None):
+        return Data.Base.select(table, conditions, fields, order)
 
     @staticmethod
-    def select(table, conditions, fields='*',order=None):
-        return Data.sql.select(table, conditions, fields,order)
+    def update(table, conditions, params, is_commit=True):
+        return Data.Base.update(table, conditions, params, is_commit)
 
     @staticmethod
-    def update(table, conditions, params, is_commit = True):
-        return Data.sql.update(table, conditions, params, is_commit)
-
-    @staticmethod
-    def delete(table, conditions, is_commit = True):
-        return Data.sql.delete(table, conditions, is_commit)
-
-    @staticmethod
-    def find_last(table, conditions,info, limit):
-        return Data.sql.find_last(table, conditions, info, limit)
-
-    @staticmethod
-    def get_max_field(table , field='id'):
-        sql = "select max(%s) from %s"%(field, table)
-        result = Data.query(sql)
-        if result[0][0] is None:
-            return 1
-
-        return result[0][0]
+    def delete(table, conditions, is_commit=True):
+        return  Data.Base.delete(table, conditions, is_commit)
 
     @staticmethod
     def find_last(table, conditions, info, limit):
-        return Data.sql.find_last(table, conditions, info, limit)
-    
-    @staticmethod
-    def query(sql):
-        # print(sql)
-        return Data.sql.query(sql)
+        return Data.Base.find_last(table, conditions, info, limit)
 
     @staticmethod
-    def truncate(table):
-        # print(sql)
-        return Data.sql.truncate(table)
+    def query(sql):
+        return Data.Base.query(sql)
+
+
+
+
