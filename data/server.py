@@ -1,7 +1,8 @@
 from data.dbserver.data_manager import data_manager
+from config.config import db_config
 
 class Data(object):
-    Base = data_manager()
+    Base = data_manager(db_config)
 
     @staticmethod
     def create(table, colums):

@@ -42,7 +42,7 @@ class Base(object):
 
     def connect_db(self):
         try:
-            self.db = pymysql.connect(self._host, self._user, self._psw, self._dbname, charset='utf8')
+            self.db = pymysql.connect(self._host, self._user, self._psw, self._dbname, charset='utf8',autocommit=True)
             self._load_tables()
             print('数据库模块连接成功')
             dbg_db('数据库模块连接成功')
@@ -304,6 +304,7 @@ class Base(object):
             cursor.execute(sql)
             results = cursor.fetchall()
             self.update_last_execute_time()
+            self.db.commit()
             # dbg_db(sql,'数据库查询成功')
         except Exception as e:
             print('<--------DBERROR-------->')

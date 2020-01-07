@@ -1,7 +1,7 @@
 import time
 
 from data.dbserver.base import Base
-from config.config import db_config
+# from config.config import db_config
 from data.dbserver.base import dbg_db
 from common.Scheduler import IntervalTask
 
@@ -10,7 +10,7 @@ from common.Scheduler import IntervalTask
 
 
 class data_manager(object):
-    def __init__(self):
+    def __init__(self,db_config):
         self.t_data = db_config
         self.sql_pool = []
 
