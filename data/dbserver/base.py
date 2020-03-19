@@ -1,5 +1,5 @@
 import pymysql
-from common.Scheduler import IntervalTask
+# from common.Scheduler import IntervalTask
 import time
 import datetime
 import sys
@@ -34,7 +34,8 @@ class Base(object):
         self._dbname = dbname
         self._tables = {}
         self._is_busy = 0
-        # self.last_connect_time = int(time.time())
+        self.init_time = int(time.time())
+        self.executing_query = ''
         self.last_execute_time = int(time.time())
         self.db = None
         self.connect_db()
@@ -42,7 +43,7 @@ class Base(object):
 
     def connect_db(self):
         try:
-            self.db = pymysql.connect(self._host, self._user, self._psw, self._dbname, charset='utf8',autocommit=True)
+            self.db = pymysql.connect(self._host, self._user, self._psw, self._dbname, charset='utf8',autocommit = True)
             self._load_tables()
             print('数据库模块连接成功')
             dbg_db('数据库模块连接成功')
@@ -159,14 +160,14 @@ class Base(object):
         else:
             fieldList = fields.split(',')
 
-        # self.db.commit()
+        self.db.commit()
         return dict(zip(fieldList, res[0]))
 
 
     # 查找数据
     def select(self, table, conditions, fields='*', order=None):
         sql = 'select %s from %s where  ' % (fields, table)
-        # if conditions == []:
+
         for unit in conditions:
             value = unit[2]
             if type("") == type(value):
@@ -203,7 +204,7 @@ class Base(object):
             data = dict(zip(fieldList, data))
             result.append(data)
 
-        # self.db.commit()
+        self.db.commit()
         return result
 
     def insert(self, table, content, isCommit=True):
@@ -290,6 +291,8 @@ class Base(object):
 
     def query(self, sql):
 
+        self.executing_query = sql
+
         if sql != 'select 1':
             if config.show_sql == True:
                 print(sql)
@@ -315,14 +318,19 @@ class Base(object):
             results = None
 
         self.update_last_connect_time()
+
+        self.executing_query = ''
+
         return results
         # results = cursor.fetchall()
 
     def update_last_connect_time(self):
         self.last_connect_time = int(time.time())
+        return
 
     def update_last_execute_time(self):
         self.last_execute_time = int(time.time())
+        return
 
     def get_last_connect_time(self):
         return self.last_connect_time

@@ -1,8 +1,43 @@
-from data.dbserver.data_manager import data_manager
 from config.config import db_config
+from data.dbserver.data_manager import data_manager
 
 class Data(object):
     Base = data_manager(db_config)
+
+    @staticmethod
+    def check_connections():
+        sql_pool = Data.Base.sql_pool
+        busy_list = []
+        all_list = []
+        free_list = []
+        sql_executing = {}
+        for sql_id in sql_pool:
+            sql = sql_pool[sql_id]
+            if sql.is_busy() == True:
+                busy_list.append(sql_id)
+                sql_executing[sql_id] = sql.executing_query
+
+            if sql.is_busy() == False:
+                free_list.append(sql_id)
+            all_list.append(sql_id)
+
+        result = {
+            'busy_base':{
+                'count':len(busy_list),
+                'lists':busy_list,
+                'executing':sql_executing,
+            },
+            'free_base': {
+                'count': len(free_list),
+                'lists': free_list
+            },
+            'all_base': {
+                'count': len(all_list),
+                'lists': all_list
+            }
+        }
+        return result
+
 
     @staticmethod
     def create(table, colums):

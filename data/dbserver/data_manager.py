@@ -12,7 +12,7 @@ from common.Scheduler import IntervalTask
 class data_manager(object):
     def __init__(self,db_config):
         self.t_data = db_config
-        self.sql_pool = []
+        self.sql_pool = {}
 
         sql = self.create_new_sql()
         self.add_new_sql(sql)
@@ -25,7 +25,7 @@ class data_manager(object):
 
     def keep_connect(self):
         can_update_sql = []
-        for sql in self.sql_pool:
+        for sql in self.sql_pool.values():
             if int(time.time())-sql.get_last_connect_time()  > 30:
                 can_update_sql.append(sql)
 
@@ -37,7 +37,7 @@ class data_manager(object):
         return
 
     def find_free_sql(self):
-        for sql in self.sql_pool:
+        for sql in self.sql_pool.values():
             if sql.is_busy() == False:
                 sql.become_busy()
                 return sql
@@ -50,7 +50,7 @@ class data_manager(object):
         return sql
 
     def add_new_sql(self,sql):
-        self.sql_pool.append(sql)
+        self.sql_pool[id(sql)] = sql
         return
 
 
@@ -133,21 +133,6 @@ class data_manager(object):
         return result
 
 
-    def get_max_field(self,table, field='id'):
-        sql = "select max(%s) from %s" % (field, table)
-        result = Data.query(sql)
-        if result[0][0] is None:
-            return 1
-        return result[0][0]
-
-
-    def find_last(self,table, conditions, info, limit):
-        sql = self.find_free_sql()
-        # sql.become_busy()
-        print('执行这次sql请求的链接是', id(sql))
-        result = sql.find_last(table, conditions, info, limit)
-        sql.become_free()
-        return result
 
 
     def query(self,sql_query):
